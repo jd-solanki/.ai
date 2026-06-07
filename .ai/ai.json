@@ -1,0 +1,10 @@
+{
+  "packages": {
+    ".": {
+      "version": "*",
+      "linked": [
+        "skills/write-a-skill"
+      ]
+    }
+  }
+}
