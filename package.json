@@ -1,6 +1,6 @@
 {
   "name": "ai",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "scripts": {
     "bump": "bumpp"
