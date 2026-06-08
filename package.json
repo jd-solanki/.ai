@@ -3,13 +3,14 @@
   "version": "1.0.5",
   "description": "",
   "scripts": {
-    "bump": "bumpp"
+    "release": "bumpp"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.19.0",
   "devDependencies": {
+    "@airig/cli": "^0.0.1",
     "bumpp": "^11.1.0"
   }
 }
