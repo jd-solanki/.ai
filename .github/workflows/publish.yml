@@ -6,7 +6,9 @@ on:
       - 'v*'
 
 permissions:
-  contents: write
+  # Keep the built-in GITHUB_TOKEN read-only: checkout only needs repository reads,
+  # while release publishing is handled by the narrower custom PAT below.
+  contents: read
 
 jobs:
   publish:
@@ -33,5 +35,15 @@ jobs:
 
       - name: Publish AI Setup
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          # Use a fine-grained PAT instead of github.token because airig checks
+          # immutable-release settings, which require Administration: read access.
+          #
+          # To create this secret:
+          # 1. Create a fine-grained PAT with access only to this repository.
+          # 2. Grant repository permissions:
+          #    - Contents: Read and write
+          #    - Administration: Read-only
+          # 3. Add it as AIRIG_PUBLISH_TOKEN in:
+          #    Settings -> Secrets and variables -> Actions -> New repository secret
+          GITHUB_TOKEN: ${{ secrets.AIRIG_PUBLISH_TOKEN }}
         run: pnpm exec airig publish "${GITHUB_REF_NAME}"
