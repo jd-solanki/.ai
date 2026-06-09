@@ -4,7 +4,12 @@
       "version": "*",
       "linked": [
         "skills/write-a-skill",
-        "skills/comment-code"
+        "skills/comment-code",
+        "skills/github-labels",
+        "skills/grill-me",
+        "skills/grill-with-docs",
+        "skills/to-issues",
+        "skills/to-prd"
       ]
     }
   }
