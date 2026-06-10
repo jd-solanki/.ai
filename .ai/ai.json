@@ -9,7 +9,8 @@
         "skills/grill-me",
         "skills/grill-with-docs",
         "skills/to-issues",
-        "skills/to-prd"
+        "skills/to-prd",
+        "skills/gh-npm-release-automation"
       ]
     }
   }
