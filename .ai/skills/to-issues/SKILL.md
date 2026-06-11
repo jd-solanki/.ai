@@ -57,15 +57,28 @@ For each approved slice, publish a new issue to the issue tracker. Use the issue
 
 Publish issues in dependency order (blockers first) so you can reference real issue identifiers in the "Blocked by" field.
 
+When the source is an existing PRD issue, each generated child issue MUST be attached to that PRD using GitHub's sub-issue feature. Create child issues with `gh api` so the REST issue `id` is available immediately, then call the sub-issues endpoint before moving to the next slice:
+
+```sh
+child_json=$(gh api repos/{owner}/{repo}/issues \
+  -f title="$title" \
+  -F body=@"$body_file" \
+  -f 'labels[]=PRD-sub-issue' \
+  -f "labels[]=$readiness_label")
+child_id=$(printf '%s' "$child_json" | jq -r '.id')
+gh api -X POST repos/{owner}/{repo}/issues/PARENT_NUMBER/sub_issues \
+  -F sub_issue_id="$child_id"
+```
+
+Use the child issue number or URL in later "Blocked by" references, but use the numeric REST `id` as `sub_issue_id`. If the sub-issue API call fails, stop and resolve it; do not treat the child issue as published for this workflow until the parent-child relationship exists.
+
 After all issues for an existing parent PRD have been created, apply `ready-for-agent` to the parent PRD issue. This marks that the PRD has been broken down and is ready for agents to pick up its child work. Do not apply `ready-for-agent` to the parent before every approved slice has a published issue.
 
 <issue-template>
 ## Parent
-
 A reference to the parent issue on the issue tracker (if the source was an existing issue, otherwise omit this section).
 
 ## What to build
-
 A concise description of this vertical slice. Describe the end-to-end behavior, not layer-by-layer implementation.
 
 Avoid specific file paths or code snippets — they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it here and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
@@ -77,7 +90,6 @@ Avoid specific file paths or code snippets — they go stale fast. Exception: if
 - [ ] Criterion 3
 
 ## Blocked by
-
 - A reference to the blocking ticket (if any)
 
 Or "None - can start immediately" if no blockers.
