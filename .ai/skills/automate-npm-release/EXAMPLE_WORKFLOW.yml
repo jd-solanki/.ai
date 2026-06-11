@@ -40,7 +40,9 @@ jobs:
         run: pnpm build
 
       - name: Publish package
-        run: npm publish --access public
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
       - name: Generate changelog
         run: npx changelogithub

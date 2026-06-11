@@ -10,7 +10,8 @@
         "skills/grill-with-docs",
         "skills/to-issues",
         "skills/to-prd",
-        "skills/gh-npm-release-automation"
+        "skills/automate-commit-based-gh-release-changelog",
+        "skills/automate-npm-release"
       ]
     }
   }
