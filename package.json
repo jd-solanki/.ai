@@ -1,6 +1,6 @@
 {
   "name": "ai",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "scripts": {
     "release": "bumpp"
@@ -10,7 +10,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.19.0",
   "devDependencies": {
-    "@airig/cli": "^0.0.1",
+    "@airig/cli": "^0.0.4",
     "bumpp": "^11.1.0"
   }
 }

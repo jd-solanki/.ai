@@ -9,16 +9,16 @@ importers:
   .:
     devDependencies:
       '@airig/cli':
-        specifier: ^0.0.1
-        version: 0.0.1(@types/node@25.9.2)
+        specifier: ^0.0.4
+        version: 0.0.4(@types/node@25.9.2)
       bumpp:
         specifier: ^11.1.0
         version: 11.1.0
 
 packages:
 
-  '@airig/cli@0.0.1':
-    resolution: {integrity: sha512-UfKnr9S3Q1LxIFslXh2Zig+1pk2NflZhaSxus9UbavaaW8adk5c+Plwd7ylJoKdveKnp0dElRzxFWwcwUIE5tQ==}
+  '@airig/cli@0.0.4':
+    resolution: {integrity: sha512-jsB0GU12OS50CKMkYMlE8G+EEZFcxtLth9KzYQHl612lj6D4PrrQhGfRco3TCfy13BjEH6uDAZtbLGsbk5jhpQ==}
     engines: {node: ^24.11.0}
     hasBin: true
 
@@ -692,7 +692,7 @@ packages:
 
 snapshots:
 
-  '@airig/cli@0.0.1(@types/node@25.9.2)':
+  '@airig/cli@0.0.4(@types/node@25.9.2)':
     dependencies:
       '@inquirer/prompts': 7.10.1(@types/node@25.9.2)
       '@octokit/rest': 21.1.1
