@@ -13,6 +13,11 @@ npm requires the first publish to be done manually to establish package name and
 npm publish --access public
 ```
 
+Right after that first manual publish, open the package settings on npm and add your GitHub Actions workflow as a trusted publisher before relying on automated releases.
+
+- npm docs: [Trusted publishing for npm packages](https://docs.npmjs.com/trusted-publishers/) — see "Step 1: Add a trusted publisher on npmjs.com" for the package settings flow and the GitHub Actions fields you must fill in
+- GitHub docs: [Publishing Node.js packages](https://docs.github.com/en/actions/tutorials/publish-packages/publish-nodejs-packages) — workflow-side reference for publishing from GitHub Actions
+
 ## Automated releases via GitHub Actions
 
 Pushing a `v*` tag triggers the full release pipeline:
