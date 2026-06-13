@@ -18,7 +18,7 @@ Use this skill to set up npm release automation. First identify the repository s
 npm publish --access public
 ```
 
-- Prefer npm trusted publishing/OIDC when the project asks for it. Configure the package on npmjs.com after the first manual publish, then use `id-token: write` in GitHub Actions.
+- Prefer npm trusted publishing/OIDC when the project asks for it. Configure the package on npmjs.com after the first manual publish, then use `id-token: write` in GitHub Actions. Ensure `package.json` has `repository.url` exactly matching the GitHub repo URL (case-sensitive) — required for provenance validation.
 - If using token-based publishing, configure `actions/setup-node` with `registry-url: https://registry.npmjs.org` so `NODE_AUTH_TOKEN` can authenticate `npm publish`.
 - Always run checks, tests, and package builds before publishing.
 - Keep the private workspace root unpublished; publish from the actual package directory.
