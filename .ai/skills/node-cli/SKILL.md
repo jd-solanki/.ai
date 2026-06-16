@@ -149,6 +149,7 @@ declare module 'update-notifier' {
 | Test runner | [`vitest`](https://vitest.dev) |
 | Version bumping | [`bumpp`](https://github.com/antfu/bumpp) — bumps `package.json`, commits, tags, and pushes in one step |
 | Bundler | [`tsdown`](https://github.com/rolldown/tsdown) |
+| Diagnostics (structured errors/warnings) | [`nostics`](https://nostics.dev/) — define a catalog of diagnostic codes with stable names, messages, fixes, and docs URLs |
 
 ## package.json essentials
 
