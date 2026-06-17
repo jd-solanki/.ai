@@ -11,7 +11,13 @@
         "skills/to-issues",
         "skills/to-prd",
         "skills/automate-commit-based-gh-release-changelog",
-        "skills/automate-npm-release"
+        "skills/automate-npm-release",
+        "skills/clean-code",
+        "skills/diagnose",
+        "skills/improve-codebase-architecture",
+        "skills/krutrimbox-github-labels",
+        "skills/node-cli",
+        "skills/tdd"
       ]
     }
   }
