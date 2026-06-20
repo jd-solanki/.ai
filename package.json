@@ -3,7 +3,7 @@
   "version": "1.0.21",
   "description": "",
   "scripts": {
-    "release": "bumpp"
+    "release": "bash scripts/release.sh"
   },
   "keywords": [],
   "author": "",
