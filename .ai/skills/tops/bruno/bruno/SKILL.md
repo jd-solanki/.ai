@@ -1,6 +1,7 @@
 ---
 name: bruno
 description: Create and manage Bruno API collections using OpenCollection YAML format. Use when adding new API requests to a Bruno collection, creating environments, writing pre/post scripts, or scaffolding a new collection. Triggers on: "add Bruno request", "create Bruno collection", "write a .yml for Bruno", "OpenCollection YAML", "bruno request".
+disable-model-invocation: true
 ---
 
 # Bruno
