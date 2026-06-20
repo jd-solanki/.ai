@@ -1,9 +1,9 @@
 {
   "name": "ai",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "",
   "scripts": {
-    "release": "bash scripts/release.sh"
+    "release": "bumpp package.json README.md"
   },
   "keywords": [],
   "author": "",
