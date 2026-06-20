@@ -1,3 +1,5 @@
+- Load `/project-conventions` skill if exists
+
 ## Skill reference loading
 
 Skills ship a main `SKILL.md` (always loaded) plus optional files in the same directory — `references/*`, `examples/*`, `SAMPLE.md`, etc. — loaded on demand. Load them deliberately: not all up-front, not blindly.

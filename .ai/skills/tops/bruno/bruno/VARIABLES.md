@@ -1,0 +1,90 @@
+# Bruno Variables Reference
+
+## All types & precedence
+
+Highest priority wins when the same name exists in multiple scopes.
+
+| Priority | Type | Scope | Set via | Persists? |
+|---|---|---|---|---|
+| 1 (highest) | **Runtime** | Session-wide | `bru.setVar(k, v)` in script | No — lost on restart |
+| 2 | **Request** | Single request | `vars` block in request YAML | In YAML |
+| 3 | **Folder** | Folder | Bruno UI | In folder file |
+| 4 | **Environment** | Active environment | `environments/<env>.yml` | In YAML |
+| 5 | **Collection** | Collection-wide | Bruno UI | In collection file |
+| 6 (lowest) | **Global** | Workspace | `bru.setGlobalEnvVar(k, v)` | Yes — app storage |
+| — | **Process Env** | OS-level | `.env` file via `{{process.env.VAR}}` | Read-only |
+| — | **Prompt** | One request run | `{{?Prompt label}}` syntax | Never stored |
+
+## When to use each
+
+**Runtime** — dynamically obtained values like OAuth tokens. Available to all requests in the same session:
+```yaml
+runtime:
+  scripts:
+    - type: after-response
+      code: bru.setVar("ACCESS_TOKEN", res.body.access_token);
+```
+Then reference as `{{ACCESS_TOKEN}}` in any request.
+
+**Environment** — static per-environment config (base URLs, feature flags, API versions):
+```yaml
+# environments/prod.yml
+variables:
+  - name: baseUrl
+    value: https://api.prod.example.com
+    type: text
+```
+
+**Process Env** — sensitive credentials loaded from `.env` (gitignored, never committed):
+```yaml
+# environments/prod.yml
+variables:
+  - name: apiToken
+    value: "{{process.env.API_TOKEN}}"
+    type: text
+    secret: true
+```
+```ini
+# .env
+API_TOKEN=pat-abc-123
+```
+Ship `.env.example` with var names and placeholder values so teammates know what to set.
+
+**Prompt** — one-off interactive input, never stored anywhere:
+```
+{{?Enter order ID}}
+```
+
+**Collection / Folder** — shared defaults across a collection or folder. Managed via Bruno UI; low priority so requests can override them.
+
+**Global** — workspace-wide defaults. Avoid — prefer environment variables which are scoped and version-controlled.
+
+## Rules
+
+- `secret: true` masks the value in Bruno UI (shows blank) — the value still works in requests
+- Do NOT put dynamically-obtained tokens in `environments/<env>.yml`. `bru.setVar` **cannot override** a `process.env.*` binding — the token will never update after `get-token` runs
+- `.env` is gitignored; always ship `.env.example` alongside it
+- Process env vars are **read-only** — use runtime or env vars for any writable state
+
+## bru JS API
+
+```javascript
+// Runtime — session-wide, lost on Bruno restart
+bru.setVar("key", value)
+bru.getVar("key")
+bru.hasVar("key")
+bru.deleteVar("key")
+
+// Environment — active environment file
+bru.setEnvVar("key", value)                    // in-memory only
+bru.setEnvVar("key", value, { persist: true }) // writes back to environments/<env>.yml
+bru.getEnvVar("key")
+bru.hasEnvVar("key")
+
+// Global — workspace-wide, persisted in app storage
+bru.setGlobalEnvVar("key", value)
+bru.getGlobalEnvVar("key")
+
+// Read-only OS environment
+bru.getProcessEnv("KEY")
+```
