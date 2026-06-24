@@ -1,6 +1,6 @@
 {
   "name": "ai",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "",
   "scripts": {
     "release": "bumpp package.json README.md"
