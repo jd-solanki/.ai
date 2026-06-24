@@ -16,6 +16,29 @@ MyFunction:
 
 Only drop to raw CloudFormation when SAM shorthand doesn't expose the property you need.
 
+## Don't Set Explicit Physical Resource Names
+
+Let CloudFormation auto-generate physical names. Do **not** set `QueueName`, `FunctionName`, `TableName`, `BucketName`, `RoleName`, `TopicName`, etc. unless an external system genuinely requires a fixed, known name (and even then, prefer exporting the generated name as a stack Output).
+
+**Why — explicit names break updates that require replacement.** When you change an immutable property of a named resource, CloudFormation must replace it. Its update strategy is *create-the-new-one-before-deleting-the-old-one*, so for a brief window two resources would need the same physical name. Names must be unique, so the create fails with `already exists` and the whole stack update rolls back:
+
+```yaml
+# Bad — a fixed name turns any future replacement into a failed deploy
+MyQueue:
+  Type: AWS::SQS::Queue
+  Properties:
+    QueueName: my-service-orders   # collides with itself during replace
+
+# Good — CloudFormation generates a unique name; replacements are seamless
+MyQueue:
+  Type: AWS::SQS::Queue
+  Properties: {}                   # reference elsewhere via !Ref / !GetAtt
+```
+
+Auto-generated names are also what make **logical-ID renames** safe: renaming a resource (or splitting one into several) deletes the old logical ID and creates new ones — with auto-naming there is no collision, so the deploy succeeds.
+
+**Corollary — don't add naming parameters that nothing consumes.** A `StackName`/`NamePrefix` parameter threaded into a nested template but never referenced by any resource is dead config: it implies control over naming that doesn't exist, and tempts the next person to "fix" it by adding an explicit name. If a parameter doesn't feed a real property, delete it. Distinctness between multiple instances of a reusable nested template already comes from each being its own nested stack — not from a name parameter.
+
 ## Resource Grouping — Group by Topic, Not by Type
 
 Do not scatter related resources across type-based sections. Group all resources for a feature under a single VSCode region block, placed at the **end** of the `Resources:` map.
