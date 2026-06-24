@@ -76,8 +76,10 @@ bru.hasVar("key")
 bru.deleteVar("key")
 
 // Environment — active environment file
-bru.setEnvVar("key", value)                    // in-memory only
-bru.setEnvVar("key", value, { persist: true }) // writes back to environments/<env>.yml
+// ⚠️ v4: setEnvVar/deleteEnvVar persist to environments/<env>.yml BY DEFAULT
+// (pre-v4 they were in-memory unless you passed { persist: true }).
+bru.setEnvVar("key", value)                    // writes back to environments/<env>.yml
+bru.deleteEnvVar("key")                         // removes from environments/<env>.yml
 bru.getEnvVar("key")
 bru.hasEnvVar("key")
 
@@ -88,3 +90,16 @@ bru.getGlobalEnvVar("key")
 // Read-only OS environment
 bru.getProcessEnv("KEY")
 ```
+
+## v4 migration: do not persist secrets via env vars
+
+As of Bruno v4, `setEnvVar()`, `deleteEnvVar()`, and `setGlobalEnvVar()` write
+their changes to disk by default — so a token written through them lands in
+`environments/<env>.yml` and can be committed to git.
+
+- For **dynamically obtained secrets** (OAuth tokens, API keys): use `bru.setVar`
+  / `bru.deleteVar` (runtime scope) — these stay in memory and are never written
+  to disk. This is already the pattern in [SKILL.md](SKILL.md) / [AUTH.md](AUTH.md).
+- A variable marked `secret: true` is never written to disk even if persisted.
+- Only use `setEnvVar`/`setGlobalEnvVar` for non-sensitive values you actually
+  want saved across sessions.
