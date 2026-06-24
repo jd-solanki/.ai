@@ -11,7 +11,7 @@ npm install --global @airig/cli
 #### 2. Run add command inside your project
 
 ```shell
-airig add jd-solanki/.ai@v1.0.23
+airig add jd-solanki/.ai@v1.0.24
 ```
 
 ### Getting Update
