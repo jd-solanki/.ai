@@ -2,113 +2,95 @@
 
 ## How secrets flow: .env → environment → request
 
-**Step 1 — `.env`** (gitignored, never committed):
+**Step 1 — `.env`** (gitignored, never committed) at the collection root:
 ```
 HUBSPOT_TOKEN=pat-xxx-yyy
-AKENEO_CLIENT_ID=abc123
-AKENEO_CLIENT_SECRET=s3cr3t
-AKENEO_USERNAME=ddi_user
-AKENEO_PASSWORD=p@ssword
+DDI_WEBHOOK_TOKEN=s3cr3t
 ```
 
-**Step 2 — `environments/<env>.yml`** — map process env to Bruno variables:
-```yaml
-name: prod
-
-variables:
-  - name: baseUrl
-    value: https://api.example.com
-    type: text
-  - name: apiToken
-    value: "{{process.env.HUBSPOT_TOKEN}}"
-    type: text
-    secret: true
-  - name: clientId
-    value: "{{process.env.AKENEO_CLIENT_ID}}"
-    type: text
-    secret: true
-  - name: clientSecret
-    value: "{{process.env.AKENEO_CLIENT_SECRET}}"
-    type: text
-    secret: true
+**Step 2 — `environments/<env>.bru`** — map process env to Bruno variables:
 ```
-> `secret: true` masks the value in Bruno UI — shows as blank. The value still works in requests. This is expected, not a bug.
+vars {
+  baseUrl: https://api.example.com
+  apiToken: {{process.env.HUBSPOT_TOKEN}}
+  ddiWebhookToken: {{process.env.DDI_WEBHOOK_TOKEN}}
+}
+```
+> The values are `{{process.env.*}}` references, so the file holds no secret — the
+> real value stays in `.env`. A leading `~` disables a variable.
 
 **Step 3 — individual request** — reference the variable:
-```yaml
-auth:
-  type: bearer
-  token: "{{apiToken}}"
+```
+auth:bearer {
+  token: {{apiToken}}
+}
 ```
 
 ---
 
 ## Auth types
 
+Name the mode in the method block (`auth: bearer`), then add the matching block.
+
 ### Bearer Token
-```yaml
-auth:
-  type: bearer
-  token: "{{apiToken}}"
 ```
+auth:bearer {
+  token: {{apiToken}}
+}
+```
+
+### API Key (header or query)
+```
+auth:apikey {
+  key: x-api-key
+  value: {{apiKey}}
+  placement: header
+}
+```
+> `placement: header` or `query`. If your Bruno version lacks `auth:apikey`, put
+> the key straight into `headers { x-api-key: {{apiKey}} }` — the server only ever
+> sees a header either way.
 
 ### Basic Auth
-```yaml
-auth:
-  type: basic
-  username: "{{clientId}}"
-  password: "{{clientSecret}}"
 ```
-> **Important:** Bruno does not auto-inject `Content-Type` when basic auth is combined with a JSON body. Add it explicitly:
-```yaml
-headers:
-  - name: Content-Type
-    value: application/json
+auth:basic {
+  username: {{clientId}}
+  password: {{clientSecret}}
+}
 ```
+> **Important:** with basic auth + a JSON body Bruno does not auto-inject
+> `Content-Type`. Add it explicitly in `headers { Content-Type: application/json }`.
 
-### API Key
-```yaml
-auth:
-  type: apikey
-  key: X-API-Key
-  value: "{{apiKey}}"
-  placement: header   # or: query
-```
-
-### Inherit (from collection or folder level)
-```yaml
-auth:
-  type: inherit
-```
+### Inherit (from collection or folder)
+Set the method block's `auth: inherit` — inherits `collection.bru`'s auth.
 
 ### No auth
-Omit the `auth` key entirely.
+Set the method block's `auth: none` and omit the auth block.
 
-### OAuth 2.0, AWS Signature v4, Digest, NTLM
-Configured via Bruno UI. Fetch `https://docs.usebruno.com/auth/overview.md` for current YAML keys.
+### OAuth 2.0, AWS SigV4, Digest, WSSE, NTLM
+Supported as `auth:oauth2`, `auth:awsv4`, `auth:digest`, `auth:wsse`, `auth:ntlm`
+blocks. Fetch `https://docs.usebruno.com/auth/overview` for current keys, or
+configure once via the Bruno UI and read back the generated `.bru`.
 
 ---
 
 ## Getting a token and sharing it across requests
 
-Use `bru.setVar` in an `after-response` script — sets a session-wide runtime variable available in all subsequent requests via `{{ACCESS_TOKEN}}`:
-
-```yaml
-runtime:
-  scripts:
-    - type: after-response
-      code: |-
-        bru.setVar("ACCESS_TOKEN", res.body.access_token);
-    - type: tests
-      code: |-
-        test("token present", () => expect(res.body.access_token).to.not.be.null);
+Capture a value into a session-wide runtime variable with `vars:post-response`:
 ```
-
-Then in any other request:
-```yaml
-auth:
-  type: bearer
-  token: "{{ACCESS_TOKEN}}"
+vars:post-response {
+  ACCESS_TOKEN: $res.body.access_token
+}
 ```
+Then reference `{{ACCESS_TOKEN}}` in any later request:
+```
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
+```
+> Do NOT add `ACCESS_TOKEN` to `environments/<env>.bru`. If it references
+> `{{process.env.*}}` there, the runtime capture cannot override it and the token
+> will never update.
 
-> Do NOT add `ACCESS_TOKEN` to `environments/<env>.yml`. If it references `{{process.env.*}}`, `bru.setVar` cannot override it and the token will never update.
+For scripted capture instead of the declarative block, use a post-response
+script: `script:post-response { bru.setVar("ACCESS_TOKEN", res.body.access_token); }`
